@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+.venv/
+
+# Logs
+logs/
+
+# Streamlit Cache
+.streamlit/
+
+# Pytest
+.pytest_cache/
+
+# VS Code
+.vscode/
+
+# Temporary
+temp/
+
+# Exports
+exports/
+
+# Reports
+reports/
+
+# OS Files
+.DS_Store
+Thumbs.db
