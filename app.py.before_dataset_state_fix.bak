@@ -40,7 +40,6 @@ import components.statistics_ui as statistics_ui
 import components.charts_ui as charts_ui
 import components.cleaning_ui as cleaning_ui
 import components.prediction_ui as prediction_ui
-import components.forecasting_ui as forecasting_ui
 import components.report_ui as report_ui
 import components.business_decision_ui as business_decision_ui
 import components.insights_ui as insights_ui
@@ -119,20 +118,9 @@ elif page == "Dataset Overview":
 
         st.session_state.data_loaded = True
 
-        # ---------------------------------------------------
-        # Keep all historical filename session-state keys
-        # synchronized for existing application components.
-        # ---------------------------------------------------
-
-        filename = (
-            st.session_state.get("filename")
-            or st.session_state.get("uploaded_filename")
-            or st.session_state.get("uploaded_file_name")
+        st.session_state.filename = (
+            st.session_state.uploaded_file_name
         )
-
-        st.session_state.filename = filename
-        st.session_state.uploaded_filename = filename
-        st.session_state.uploaded_file_name = filename
 
         from analysis import (
             dataset_profile,
@@ -172,10 +160,6 @@ elif page == "Data Cleaning":
 elif page == "Machine Learning":
 
     prediction_ui.render_prediction_ui()
-
-elif page == "Forecasting":
-
-    forecasting_ui.render_forecasting_ui()
 
 
 elif page == "Business Insights":

@@ -1,0 +1,730 @@
+﻿"""
+===========================================================
+InsightAI - Voice Assistant UI
+-----------------------------------------------------------
+Streamlit interface for the existing voice-input engine.
+
+This module:
+- Provides microphone controls.
+- Displays microphone availability.
+- Captures spoken business questions.
+- Displays the generated transcript.
+- Uses the existing voice adapter.
+- Does not modify the decision engine.
+
+Protected modules:
+- core/voice_input.py
+- core/voice_decision_adapter.py
+===========================================================
+"""
+
+from __future__ import annotations
+
+import pandas as pd
+import streamlit as st
+
+
+# ===========================================================
+# STYLING
+# ===========================================================
+
+def _inject_voice_styles() -> None:
+    """Inject isolated Voice Assistant styling."""
+
+    st.html(
+        """
+        <style>
+
+        .voice-hero {
+            padding: 2rem 2.2rem;
+            border-radius: 24px;
+            margin-bottom: 1.4rem;
+            border: 1px solid rgba(128, 128, 128, 0.20);
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(37, 99, 235, 0.15),
+                    rgba(124, 58, 237, 0.12)
+                );
+        }
+
+        .voice-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.8rem;
+            background: rgba(37, 99, 235, 0.12);
+        }
+
+        .voice-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 850;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+        }
+
+        .voice-subtitle {
+            margin-top: 0.75rem;
+            max-width: 800px;
+            line-height: 1.65;
+            opacity: 0.72;
+        }
+
+        .voice-card {
+            padding: 1.4rem;
+            border-radius: 20px;
+            border: 1px solid rgba(128, 128, 128, 0.18);
+            background: rgba(128, 128, 128, 0.045);
+            min-height: 150px;
+        }
+
+        .voice-card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .voice-card-title {
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .voice-card-text {
+            margin-top: 0.4rem;
+            font-size: 0.84rem;
+            line-height: 1.5;
+            opacity: 0.68;
+        }
+
+        .transcript-card {
+            padding: 1.25rem 1.4rem;
+            border-radius: 18px;
+            border: 1px solid rgba(37, 99, 235, 0.22);
+            background: rgba(37, 99, 235, 0.06);
+            margin-top: 1rem;
+        }
+
+        .transcript-label {
+            font-size: 0.70rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            opacity: 0.58;
+        }
+
+        .transcript-text {
+            margin-top: 0.5rem;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        </style>
+        """
+    )
+
+
+# ===========================================================
+# HERO
+# ===========================================================
+
+def _render_hero() -> None:
+    """Render Voice Assistant hero."""
+
+    st.html(
+        """
+        <div class="voice-hero">
+
+            <div class="voice-badge">
+                ◉ VOICE INTELLIGENCE
+            </div>
+
+            <div class="voice-title">
+                Voice Business Assistant
+            </div>
+
+            <div class="voice-subtitle">
+                Ask your business question naturally using your
+                microphone. InsightAI converts your speech into
+                a structured business question for the existing
+                decision workflow.
+            </div>
+
+        </div>
+        """
+    )
+
+
+# ===========================================================
+# CAPABILITY CARDS
+# ===========================================================
+
+def _render_capabilities() -> None:
+    """Render Voice Assistant capabilities."""
+
+    columns = st.columns(3)
+
+    cards = [
+        (
+            "🎙️",
+            "Speak Naturally",
+            "Ask your business question using your microphone."
+        ),
+        (
+            "📝",
+            "Automatic Transcript",
+            "Your spoken question is converted into text."
+        ),
+        (
+            "🧠",
+            "Decision Ready",
+            "The normalized question can enter the existing "
+            "business decision workflow."
+        ),
+    ]
+
+    for column, (icon, title, text) in zip(
+        columns,
+        cards,
+    ):
+        with column:
+            st.html(
+                f"""
+                <div class="voice-card">
+
+                    <div class="voice-card-icon">
+                        {icon}
+                    </div>
+
+                    <div class="voice-card-title">
+                        {title}
+                    </div>
+
+                    <div class="voice-card-text">
+                        {text}
+                    </div>
+
+                </div>
+                """
+            )
+
+
+# ===========================================================
+# MICROPHONE STATUS
+# ===========================================================
+
+def _render_microphone_status() -> None:
+    """Display microphone availability."""
+
+    from core.voice_input import check_microphone
+
+    st.subheader("🎙️ Microphone Status")
+
+    try:
+
+        available = check_microphone()
+
+    except Exception as exc:
+
+        st.warning(
+            f"Microphone check unavailable: {exc}"
+        )
+        return
+
+    if available:
+
+        st.success(
+            "Microphone is available and ready."
+        )
+
+    else:
+
+        st.error(
+            "Microphone is not available. "
+            "Check your microphone connection and permissions."
+        )
+
+
+# ===========================================================
+# VOICE CAPTURE
+# ===========================================================
+
+def _capture_voice() -> None:
+    """Capture a spoken business question."""
+
+    from core.voice_input import (
+        capture_business_question,
+    )
+
+    from core.voice_decision_adapter import (
+        build_question_payload,
+    )
+
+    with st.spinner(
+        "Listening... Please speak your business question."
+    ):
+
+        try:
+
+            transcript = capture_business_question()
+
+            payload = build_question_payload(
+                transcript,
+                source="voice",
+            )
+
+            st.session_state.voice_transcript = (
+                transcript
+            )
+
+            st.session_state.voice_payload = (
+                payload
+            )
+
+            st.success(
+                "Voice question captured successfully."
+            )
+
+        except Exception as exc:
+
+            st.error(
+                str(exc)
+            )
+
+
+# ===========================================================
+# TRANSCRIPT
+# ===========================================================
+
+def _render_transcript() -> None:
+    """Render the latest voice transcript."""
+
+    transcript = st.session_state.get(
+        "voice_transcript"
+    )
+
+    if not transcript:
+        return
+
+    st.html(
+        f"""
+        <div class="transcript-card">
+
+            <div class="transcript-label">
+                Recognized Business Question
+            </div>
+
+            <div class="transcript-text">
+                “{transcript}”
+            </div>
+
+        </div>
+        """
+    )
+
+    payload = st.session_state.get(
+        "voice_payload"
+    )
+
+    if isinstance(payload, dict):
+
+        st.caption(
+            f"Input source: "
+            f"{payload.get('source', 'voice')}"
+        )
+
+
+
+# ===========================================================
+# DECISION ANALYSIS
+# ===========================================================
+
+def _get_candidate_columns(
+    df: pd.DataFrame,
+) -> tuple[list[str], list[str]]:
+    """Return safe date and numeric target candidates."""
+
+    date_columns: list[str] = []
+
+    for column in df.columns:
+
+        series = df[column]
+
+        if pd.api.types.is_datetime64_any_dtype(series):
+            date_columns.append(column)
+            continue
+
+        if pd.api.types.is_object_dtype(series):
+
+            converted = pd.to_datetime(
+                series,
+                errors="coerce",
+            )
+
+            if len(series) > 0:
+
+                valid_ratio = converted.notna().mean()
+
+                if valid_ratio >= 0.70:
+                    date_columns.append(column)
+
+    numeric_columns = (
+        df.select_dtypes(
+            include="number"
+        )
+        .columns
+        .tolist()
+    )
+
+    return date_columns, numeric_columns
+
+
+def _render_decision_result() -> None:
+    """Run and display the existing business decision pipeline."""
+
+    transcript = st.session_state.get(
+        "voice_transcript"
+    )
+
+    df = st.session_state.get(
+        "df"
+    )
+
+    if not transcript:
+        return
+
+    st.divider()
+
+    st.subheader(
+        "?? Decision Intelligence"
+    )
+
+    if not isinstance(df, pd.DataFrame) or df.empty:
+
+        st.warning(
+            "Please upload a dataset first. "
+            "The Voice Assistant needs your dataset "
+            "to generate a business recommendation."
+        )
+
+        return
+
+    date_candidates, target_candidates = (
+        _get_candidate_columns(df)
+    )
+
+    if not date_candidates:
+
+        st.error(
+            "No suitable date column was detected "
+            "in the current dataset."
+        )
+
+        return
+
+    if not target_candidates:
+
+        st.error(
+            "No numeric target column was detected "
+            "in the current dataset."
+        )
+
+        return
+
+    st.subheader(
+        "?? Configure Decision Analysis"
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        date_column = st.selectbox(
+            "?? Date Column",
+            options=date_candidates,
+            key="voice_date_column",
+        )
+
+    with col2:
+
+        target_column = st.selectbox(
+            "?? Target Column",
+            options=target_candidates,
+            key="voice_target_column",
+        )
+
+    filename = st.session_state.get(
+        "uploaded_file_name",
+        st.session_state.get(
+            "filename",
+            "Current Dataset",
+        ),
+    )
+
+    st.caption(
+        f"Dataset: {filename} ? "
+        f"{len(df):,} rows ? "
+        f"{len(df.columns):,} columns"
+    )
+
+    if st.button(
+        "?? Analyze with InsightAI",
+        type="primary",
+        use_container_width=True,
+        key="voice_decision_button",
+    ):
+
+        from core.decision_orchestrator import (
+            orchestrate_business_decision,
+        )
+
+        with st.spinner(
+            "Analyzing your dataset and business question..."
+        ):
+
+            try:
+
+                result = orchestrate_business_decision(
+                    df=df,
+                    date_column=date_column,
+                    target_column=target_column,
+                    business_question=transcript,
+                )
+
+                st.session_state.voice_decision_result = (
+                    result
+                )
+
+                st.success(
+                    "Business decision analysis completed."
+                )
+
+            except Exception as exc:
+
+                st.session_state.voice_decision_result = None
+
+                st.error(
+                    f"Decision analysis failed: {exc}"
+                )
+
+    _display_decision_result()
+
+
+# ===========================================================
+# DECISION RESULT DISPLAY
+# ===========================================================
+
+def _display_decision_result() -> None:
+    """Display the latest business decision result."""
+
+    result = st.session_state.get(
+        "voice_decision_result"
+    )
+
+    if not isinstance(result, dict):
+        return
+
+    st.divider()
+
+    st.subheader(
+        "?? InsightAI Recommendation"
+    )
+
+    summary = result.get(
+        "summary",
+        {},
+    )
+
+    decision = result.get(
+        "decision",
+        summary.get(
+            "decision_status",
+            "Unavailable",
+        ),
+    )
+
+    risk = result.get(
+        "risk",
+        "Moderate",
+    )
+
+    score = result.get(
+        "decision_score",
+        "?",
+    )
+
+    confidence = result.get(
+        "confidence",
+        "?",
+    )
+
+    recommendation = result.get(
+        "recommendation",
+        "",
+    )
+
+    if isinstance(
+        recommendation,
+        dict,
+    ):
+
+        recommendation = recommendation.get(
+            "recommendation",
+            "",
+        )
+
+    forecast_direction = "Unavailable"
+
+    forecast = result.get(
+        "forecast",
+        {},
+    )
+
+    if isinstance(forecast, dict):
+
+        forecast_info = forecast.get(
+            "forecast",
+            {},
+        )
+
+        if isinstance(
+            forecast_info,
+            dict,
+        ):
+
+            forecast_direction = forecast_info.get(
+                "direction",
+                "Unavailable",
+            )
+
+    columns = st.columns(4)
+
+    with columns[0]:
+
+        st.metric(
+            "?? Decision",
+            str(decision),
+        )
+
+    with columns[1]:
+
+        st.metric(
+            "?? Risk",
+            str(risk),
+        )
+
+    with columns[2]:
+
+        if isinstance(
+            score,
+            (int, float),
+        ):
+
+            score_display = f"{score:.1f}"
+
+        else:
+
+            score_display = str(score)
+
+        st.metric(
+            "?? Decision Score",
+            score_display,
+        )
+
+    with columns[3]:
+
+        if isinstance(
+            confidence,
+            (int, float),
+        ):
+
+            confidence_display = (
+                f"{confidence:.1f}%"
+            )
+
+        else:
+
+            confidence_display = str(confidence)
+
+        st.metric(
+            "?? Confidence",
+            confidence_display,
+        )
+
+    st.success(
+        recommendation
+        or "No recommendation available."
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.info(
+            f"?? Forecast Direction: "
+            f"{forecast_direction}"
+        )
+
+    with col2:
+
+        question = result.get(
+            "business_question",
+            st.session_state.get(
+                "voice_transcript",
+                "",
+            ),
+        )
+
+        st.info(
+            f"??? Question: {question}"
+        )
+
+    with st.expander(
+        "View detailed decision analysis"
+    ):
+
+        st.json(
+            result,
+            expanded=False,
+        )
+
+
+# ===========================================================
+# MAIN UI
+# ===========================================================
+
+def render_voice_ui() -> None:
+    """Render the complete Voice Assistant page."""
+
+    _inject_voice_styles()
+
+    _render_hero()
+
+    _render_capabilities()
+
+    st.divider()
+
+    _render_microphone_status()
+
+    st.divider()
+
+    st.subheader(
+        "🎤 Ask InsightAI"
+    )
+
+    st.write(
+        "Click the button, wait for the microphone to activate, "
+        "and speak your business question."
+    )
+
+    if st.button(
+        "🎙️  Start Voice Input",
+        type="primary",
+        use_container_width=True,
+    ):
+
+        _capture_voice()
+
+    _render_transcript()

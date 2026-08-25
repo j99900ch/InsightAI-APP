@@ -1,0 +1,374 @@
+﻿"""
+===========================================================
+InsightAI - Voice Assistant UI
+-----------------------------------------------------------
+Streamlit interface for the existing voice-input engine.
+
+This module:
+- Provides microphone controls.
+- Displays microphone availability.
+- Captures spoken business questions.
+- Displays the generated transcript.
+- Uses the existing voice adapter.
+- Does not modify the decision engine.
+
+Protected modules:
+- core/voice_input.py
+- core/voice_decision_adapter.py
+===========================================================
+"""
+
+from __future__ import annotations
+
+import streamlit as st
+
+
+# ===========================================================
+# STYLING
+# ===========================================================
+
+def _inject_voice_styles() -> None:
+    """Inject isolated Voice Assistant styling."""
+
+    st.html(
+        """
+        <style>
+
+        .voice-hero {
+            padding: 2rem 2.2rem;
+            border-radius: 24px;
+            margin-bottom: 1.4rem;
+            border: 1px solid rgba(128, 128, 128, 0.20);
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(37, 99, 235, 0.15),
+                    rgba(124, 58, 237, 0.12)
+                );
+        }
+
+        .voice-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.8rem;
+            background: rgba(37, 99, 235, 0.12);
+        }
+
+        .voice-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 850;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+        }
+
+        .voice-subtitle {
+            margin-top: 0.75rem;
+            max-width: 800px;
+            line-height: 1.65;
+            opacity: 0.72;
+        }
+
+        .voice-card {
+            padding: 1.4rem;
+            border-radius: 20px;
+            border: 1px solid rgba(128, 128, 128, 0.18);
+            background: rgba(128, 128, 128, 0.045);
+            min-height: 150px;
+        }
+
+        .voice-card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .voice-card-title {
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .voice-card-text {
+            margin-top: 0.4rem;
+            font-size: 0.84rem;
+            line-height: 1.5;
+            opacity: 0.68;
+        }
+
+        .transcript-card {
+            padding: 1.25rem 1.4rem;
+            border-radius: 18px;
+            border: 1px solid rgba(37, 99, 235, 0.22);
+            background: rgba(37, 99, 235, 0.06);
+            margin-top: 1rem;
+        }
+
+        .transcript-label {
+            font-size: 0.70rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            opacity: 0.58;
+        }
+
+        .transcript-text {
+            margin-top: 0.5rem;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        </style>
+        """
+    )
+
+
+# ===========================================================
+# HERO
+# ===========================================================
+
+def _render_hero() -> None:
+    """Render Voice Assistant hero."""
+
+    st.html(
+        """
+        <div class="voice-hero">
+
+            <div class="voice-badge">
+                ◉ VOICE INTELLIGENCE
+            </div>
+
+            <div class="voice-title">
+                Voice Business Assistant
+            </div>
+
+            <div class="voice-subtitle">
+                Ask your business question naturally using your
+                microphone. InsightAI converts your speech into
+                a structured business question for the existing
+                decision workflow.
+            </div>
+
+        </div>
+        """
+    )
+
+
+# ===========================================================
+# CAPABILITY CARDS
+# ===========================================================
+
+def _render_capabilities() -> None:
+    """Render Voice Assistant capabilities."""
+
+    columns = st.columns(3)
+
+    cards = [
+        (
+            "🎙️",
+            "Speak Naturally",
+            "Ask your business question using your microphone."
+        ),
+        (
+            "📝",
+            "Automatic Transcript",
+            "Your spoken question is converted into text."
+        ),
+        (
+            "🧠",
+            "Decision Ready",
+            "The normalized question can enter the existing "
+            "business decision workflow."
+        ),
+    ]
+
+    for column, (icon, title, text) in zip(
+        columns,
+        cards,
+    ):
+        with column:
+            st.html(
+                f"""
+                <div class="voice-card">
+
+                    <div class="voice-card-icon">
+                        {icon}
+                    </div>
+
+                    <div class="voice-card-title">
+                        {title}
+                    </div>
+
+                    <div class="voice-card-text">
+                        {text}
+                    </div>
+
+                </div>
+                """
+            )
+
+
+# ===========================================================
+# MICROPHONE STATUS
+# ===========================================================
+
+def _render_microphone_status() -> None:
+    """Display microphone availability."""
+
+    from core.voice_input import check_microphone
+
+    st.subheader("🎙️ Microphone Status")
+
+    try:
+
+        available = check_microphone()
+
+    except Exception as exc:
+
+        st.warning(
+            f"Microphone check unavailable: {exc}"
+        )
+        return
+
+    if available:
+
+        st.success(
+            "Microphone is available and ready."
+        )
+
+    else:
+
+        st.error(
+            "Microphone is not available. "
+            "Check your microphone connection and permissions."
+        )
+
+
+# ===========================================================
+# VOICE CAPTURE
+# ===========================================================
+
+def _capture_voice() -> None:
+    """Capture a spoken business question."""
+
+    from core.voice_input import (
+        capture_business_question,
+    )
+
+    from core.voice_decision_adapter import (
+        build_question_payload,
+    )
+
+    with st.spinner(
+        "Listening... Please speak your business question."
+    ):
+
+        try:
+
+            transcript = capture_business_question()
+
+            payload = build_question_payload(
+                transcript,
+                source="voice",
+            )
+
+            st.session_state.voice_transcript = (
+                transcript
+            )
+
+            st.session_state.voice_payload = (
+                payload
+            )
+
+            st.success(
+                "Voice question captured successfully."
+            )
+
+        except Exception as exc:
+
+            st.error(
+                str(exc)
+            )
+
+
+# ===========================================================
+# TRANSCRIPT
+# ===========================================================
+
+def _render_transcript() -> None:
+    """Render the latest voice transcript."""
+
+    transcript = st.session_state.get(
+        "voice_transcript"
+    )
+
+    if not transcript:
+        return
+
+    st.html(
+        f"""
+        <div class="transcript-card">
+
+            <div class="transcript-label">
+                Recognized Business Question
+            </div>
+
+            <div class="transcript-text">
+                “{transcript}”
+            </div>
+
+        </div>
+        """
+    )
+
+    payload = st.session_state.get(
+        "voice_payload"
+    )
+
+    if isinstance(payload, dict):
+
+        st.caption(
+            f"Input source: "
+            f"{payload.get('source', 'voice')}"
+        )
+
+
+# ===========================================================
+# MAIN UI
+# ===========================================================
+
+def render_voice_ui() -> None:
+    """Render the complete Voice Assistant page."""
+
+    _inject_voice_styles()
+
+    _render_hero()
+
+    _render_capabilities()
+
+    st.divider()
+
+    _render_microphone_status()
+
+    st.divider()
+
+    st.subheader(
+        "🎤 Ask InsightAI"
+    )
+
+    st.write(
+        "Click the button, wait for the microphone to activate, "
+        "and speak your business question."
+    )
+
+    if st.button(
+        "🎙️  Start Voice Input",
+        type="primary",
+        use_container_width=True,
+    ):
+
+        _capture_voice()
+
+    _render_transcript()

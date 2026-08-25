@@ -162,6 +162,7 @@ def _build_tree_explanation(
         X_explanation,
         feature_names,
         row_index=0,
+        top_features=5,
     )
 
 

@@ -33,9 +33,7 @@ CHARTS = "Charts"
 CLEANING = "Data Cleaning"
 ML = "Machine Learning"
 INSIGHTS = "Business Insights"
-FORECASTING = "Forecasting"
 BUSINESS_DECISION = "Business Decision"
-VOICE = "Voice Assistant"
 REPORT = "PDF Report"
 EXPORT = "Export"
 
@@ -48,9 +46,7 @@ PAGES = [
     CLEANING,
     ML,
     INSIGHTS,
-    FORECASTING,
     BUSINESS_DECISION,
-    VOICE,
     REPORT,
     EXPORT,
 ]
@@ -67,9 +63,7 @@ NAVIGATION = {
     CLEANING: ":broom: Data Cleaning",
     ML: ":robot_face: Machine Learning",
     INSIGHTS: ":bulb: Business Insights",
-    FORECASTING: ":chart_with_upwards_trend: Forecasting",
     BUSINESS_DECISION: ":dart: Business Decision",
-    VOICE: ":microphone: Voice Assistant",
     REPORT: ":page_facing_up: PDF Report",
     EXPORT: ":inbox_tray: Export",
 }

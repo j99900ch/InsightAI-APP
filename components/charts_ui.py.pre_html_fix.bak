@@ -513,19 +513,39 @@ def render_automated_charts(
         start=1,
     ):
 
-        with st.container(border=True):
+        st.markdown(
+            f"""
+            <div style="
+                padding: 18px;
+                border-radius: 14px;
+                border: 1px solid rgba(128,128,128,0.25);
+                margin: 12px 0;
+            ">
+                <div style="
+                    font-size: 13px;
+                    opacity: 0.7;
+                    margin-bottom: 5px;
+                ">
+                    RECOMMENDATION {index}
+                </div>
 
-            st.caption(
-                f"RECOMMENDATION {index}"
-            )
+                <div style="
+                    font-size: 21px;
+                    font-weight: 700;
+                ">
+                    {recommendation["title"]}
+                </div>
 
-            st.markdown(
-                f"### {recommendation['title']}"
-            )
-
-            st.caption(
-                recommendation["type"]
-            )
+                <div style="
+                    margin-top: 7px;
+                    opacity: 0.75;
+                ">
+                    {recommendation["type"]}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         chart_type = recommendation["type"]
 
@@ -685,13 +705,29 @@ def render_chart_header(
         or "Sample Dataset"
     )
 
-    st.title(
-        "Visualization Studio"
-    )
+    st.markdown(
+        """
+        <div style="
+            padding: 8px 0 4px 0;
+        ">
+            <div style="
+                font-size: 34px;
+                font-weight: 800;
+            ">
+                Visualization Studio
+            </div>
 
-    st.caption(
-        "Explore patterns, relationships and "
-        "business signals hidden inside your data."
+            <div style="
+                font-size: 15px;
+                opacity: 0.65;
+                margin-top: 5px;
+            ">
+                Explore patterns, relationships and
+                business signals hidden inside your data.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     st.caption(

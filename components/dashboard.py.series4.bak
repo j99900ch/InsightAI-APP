@@ -1,0 +1,641 @@
+"""
+===========================================================
+InsightAI - Dashboard Component
+-----------------------------------------------------------
+Professional application dashboard.
+
+Responsibilities
+----------------
+- Render the InsightAI home dashboard
+- Display application status
+- Display dataset overview
+- Display available analytics capabilities
+- Display dataset summary
+- Preserve existing session-state behavior
+
+This module only renders the dashboard.
+It NEVER changes navigation or page routing.
+===========================================================
+"""
+
+from __future__ import annotations
+
+from textwrap import dedent
+
+import streamlit as st
+
+
+# ===========================================================
+# DASHBOARD STYLING
+# ===========================================================
+
+def _inject_dashboard_styles() -> None:
+    """Inject dashboard-specific visual styling."""
+
+    st.markdown(
+        """
+        <style>
+
+        .insight-hero {
+            padding: 2.2rem 2.4rem;
+            border-radius: 24px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(128, 128, 128, 0.20);
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(70, 90, 180, 0.16),
+                    rgba(80, 180, 170, 0.08)
+                );
+        }
+
+        .insight-hero-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            border: 1px solid rgba(128, 128, 128, 0.25);
+            margin-bottom: 0.9rem;
+        }
+
+        .insight-hero-title {
+            font-size: clamp(2rem, 4vw, 3.4rem);
+            line-height: 1.05;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.04em;
+        }
+
+        .insight-hero-subtitle {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-top: 0.9rem;
+            opacity: 0.78;
+            max-width: 850px;
+        }
+
+        .dashboard-card {
+            padding: 1.25rem;
+            border-radius: 18px;
+            border: 1px solid rgba(128, 128, 128, 0.20);
+            background: rgba(128, 128, 128, 0.055);
+            min-height: 125px;
+        }
+
+        .dashboard-card-icon {
+            font-size: 1.55rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-card-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            opacity: 0.65;
+        }
+
+        .dashboard-card-value {
+            font-size: 1.65rem;
+            font-weight: 800;
+            margin-top: 0.35rem;
+        }
+
+        .capability-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(128, 128, 128, 0.18);
+            background: rgba(128, 128, 128, 0.045);
+            min-height: 180px;
+        }
+
+        .capability-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.55rem;
+        }
+
+        .capability-title {
+            font-size: 1rem;
+            font-weight: 750;
+            margin-bottom: 0.4rem;
+        }
+
+        .capability-text {
+            font-size: 0.88rem;
+            line-height: 1.55;
+            opacity: 0.70;
+        }
+
+        .section-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            font-weight: 800;
+            opacity: 0.58;
+            margin-bottom: 0.25rem;
+        }
+
+        .section-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .dataset-status {
+            padding: 1.2rem 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(128, 128, 128, 0.20);
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .dataset-name {
+            font-size: 1.1rem;
+            font-weight: 750;
+        }
+
+        .dataset-caption {
+            font-size: 0.85rem;
+            opacity: 0.65;
+            margin-top: 0.25rem;
+        }
+
+        .dashboard-footer {
+            text-align: center;
+            padding: 1.5rem 0 0.5rem 0;
+            opacity: 0.55;
+            font-size: 0.78rem;
+        }
+
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ===========================================================
+# DATASET METRICS
+# ===========================================================
+
+def _get_dataset_metrics() -> dict[str, object]:
+    """Safely calculate dashboard dataset metrics."""
+
+    df = st.session_state.get("df")
+
+    if df is None:
+        return {
+            "rows": 0,
+            "columns": 0,
+            "numeric": 0,
+            "categorical": 0,
+            "missing": 0,
+        }
+
+    try:
+        rows, columns = df.shape
+
+        numeric = len(
+            df.select_dtypes(
+                include="number"
+            ).columns
+        )
+
+        categorical = len(
+            df.select_dtypes(
+                include=[
+                    "object",
+                    "category",
+                    "bool",
+                    "string",
+                ]
+            ).columns
+        )
+
+        missing = int(
+            df.isna().sum().sum()
+        )
+
+        return {
+            "rows": rows,
+            "columns": columns,
+            "numeric": numeric,
+            "categorical": categorical,
+            "missing": missing,
+        }
+
+    except Exception:
+        return {
+            "rows": 0,
+            "columns": 0,
+            "numeric": 0,
+            "categorical": 0,
+            "missing": 0,
+        }
+
+
+# ===========================================================
+# METRIC CARD
+# ===========================================================
+
+def _render_metric_card(
+    column,
+    icon: str,
+    title: str,
+    value: object,
+) -> None:
+    """Render one dashboard metric card."""
+
+    with column:
+        st.markdown(
+            f"""
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-icon">
+                    {icon}
+                </div>
+
+                <div class="dashboard-card-title">
+                    {title}
+                </div>
+
+                <div class="dashboard-card-value">
+                    {value}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+# ===========================================================
+# CAPABILITY CARD
+# ===========================================================
+
+def _render_capability_card(
+    column,
+    icon: str,
+    title: str,
+    description: str,
+) -> None:
+    """Render one analytics capability card."""
+
+    with column:
+        st.markdown(
+            f"""
+            <div class="capability-card">
+
+                <div class="capability-icon">
+                    {icon}
+                </div>
+
+                <div class="capability-title">
+                    {title}
+                </div>
+
+                <div class="capability-text">
+                    {description}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+# ===========================================================
+# HERO
+# ===========================================================
+
+def _render_hero() -> None:
+    """Render the main dashboard hero section."""
+
+    st.markdown(
+        """
+        <div class="insight-hero">
+
+            <div class="insight-hero-badge">
+                &#9670; INTELLIGENT ANALYTICS PLATFORM
+            </div>
+
+            <div class="insight-hero-title">
+                InsightAI
+            </div>
+
+            <div class="insight-hero-subtitle">
+                Transform raw business data into meaningful
+                statistics, visual intelligence, machine-learning
+                predictions, business insights and decision support.
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ===========================================================
+# DATASET STATUS
+# ===========================================================
+
+def _render_dataset_status() -> None:
+    """Render the current dataset status."""
+
+    filename = st.session_state.get(
+        "uploaded_file_name"
+    )
+
+    if filename:
+        st.markdown(
+            f"""
+            <div class="dataset-status">
+
+                <div class="section-label">
+                    ACTIVE DATASET
+                </div>
+
+                <div class="dataset-name">
+                    &#9673; {filename}
+                </div>
+
+                <div class="dataset-caption">
+                    Dataset successfully loaded and ready
+                    for analysis.
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    else:
+        st.info(
+            "No dataset is currently loaded. "
+            "Open **Dataset Overview** from the navigation "
+            "panel to upload a CSV or Excel dataset."
+        )
+
+
+# ===========================================================
+# DATASET SNAPSHOT
+# ===========================================================
+
+def _render_dataset_metrics(
+    metrics: dict[str, object],
+) -> None:
+    """Render high-level dataset metrics."""
+
+    st.markdown(
+        '<div class="section-label">DATA INTELLIGENCE</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div class="section-title">Dataset Snapshot</div>',
+        unsafe_allow_html=True,
+    )
+
+    columns = st.columns(5)
+
+    _render_metric_card(
+        columns[0],
+        "&#9638;",
+        "Rows",
+        f"{metrics['rows']:,}",
+    )
+
+    _render_metric_card(
+        columns[1],
+        "&#9670;",
+        "Columns",
+        f"{metrics['columns']:,}",
+    )
+
+    _render_metric_card(
+        columns[2],
+        "&#8721;",
+        "Numeric",
+        f"{metrics['numeric']:,}",
+    )
+
+    _render_metric_card(
+        columns[3],
+        "&#9672;",
+        "Categorical",
+        f"{metrics['categorical']:,}",
+    )
+
+    _render_metric_card(
+        columns[4],
+        "&#9651;",
+        "Missing",
+        f"{metrics['missing']:,}",
+    )
+
+
+# ===========================================================
+# CAPABILITIES
+# ===========================================================
+
+def _render_capabilities() -> None:
+    """Render InsightAI analytics capabilities."""
+
+    st.markdown(
+        '<div class="section-label">ANALYTICS ENGINE</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div class="section-title">What InsightAI Can Do</div>',
+        unsafe_allow_html=True,
+    )
+
+    row_one = st.columns(3)
+
+    _render_capability_card(
+        row_one[0],
+        "&#9672;",
+        "Dataset Intelligence",
+        "Profile datasets, inspect structure, identify "
+        "missing values, duplicates and data-quality signals.",
+    )
+
+    _render_capability_card(
+        row_one[1],
+        "&#8721;",
+        "Advanced Statistics",
+        "Generate descriptive, numeric and categorical "
+        "statistics for deeper dataset understanding.",
+    )
+
+    _render_capability_card(
+        row_one[2],
+        "&#9670;",
+        "Visual Analytics",
+        "Explore distributions, relationships, trends, "
+        "categories and correlations through interactive charts.",
+    )
+
+    st.write("")
+
+    row_two = st.columns(3)
+
+    _render_capability_card(
+        row_two[0],
+        "&#9671;",
+        "Machine Learning",
+        "Train classification and regression models, "
+        "compare algorithms and generate predictions.",
+    )
+
+    _render_capability_card(
+        row_two[1],
+        "&#9673;",
+        "Business Insights",
+        "Translate analytical results into practical "
+        "business observations and opportunities.",
+    )
+
+    _render_capability_card(
+        row_two[2],
+        "&#9670;",
+        "Decision Intelligence",
+        "Combine forecasting, business rules and decision "
+        "signals to support more informed decisions.",
+    )
+
+    st.write("")
+
+    row_three = st.columns(3)
+
+    _render_capability_card(
+        row_three[0],
+        "&#9673;",
+        "Voice Interaction",
+        "Ask supported business questions through voice "
+        "input instead of typing them manually.",
+    )
+
+    _render_capability_card(
+        row_three[1],
+        "&#8599;",
+        "Forecasting",
+        "Analyze historical trends and generate future "
+        "business forecasts for planning.",
+    )
+
+    _render_capability_card(
+        row_three[2],
+        "&#9632;",
+        "Professional Reports",
+        "Generate structured analytical reports and "
+        "export important results for business use.",
+    )
+
+
+# ===========================================================
+# DATASET SUMMARY
+# ===========================================================
+
+def _render_dataset_summary() -> None:
+    """Render the existing dataset summary."""
+
+    summary = st.session_state.get(
+        "dataset_summary",
+        {},
+    )
+
+    if not summary:
+        return
+
+    st.markdown(
+        '<div class="section-label">BUSINESS CONTEXT</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div class="section-title">Dataset Summary</div>',
+        unsafe_allow_html=True,
+    )
+
+    items = list(summary.items())
+
+    if not items:
+        return
+
+    columns = st.columns(2)
+
+    midpoint = (
+        len(items) + 1
+    ) // 2
+
+    with columns[0]:
+        for key, value in items[:midpoint]:
+            st.metric(
+                label=str(key)
+                .replace("_", " ")
+                .title(),
+                value=value,
+            )
+
+    with columns[1]:
+        for key, value in items[midpoint:]:
+            st.metric(
+                label=str(key)
+                .replace("_", " ")
+                .title(),
+                value=value,
+            )
+
+
+# ===========================================================
+# MAIN DASHBOARD
+# ===========================================================
+
+def render_dashboard() -> None:
+    """
+    Render the complete InsightAI dashboard.
+
+    This function does not modify navigation
+    or page routing.
+    """
+
+    _inject_dashboard_styles()
+
+    _render_hero()
+
+    metrics = _get_dataset_metrics()
+
+    _render_dataset_status()
+
+    st.divider()
+
+    _render_dataset_metrics(
+        metrics
+    )
+
+    st.divider()
+
+    _render_capabilities()
+
+    if st.session_state.get(
+        "dataset_summary",
+        {},
+    ):
+        st.divider()
+
+        _render_dataset_summary()
+
+    st.divider()
+
+    st.markdown(
+        """
+        <div class="dashboard-footer">
+            InsightAI Professional Analytics Platform
+            &#8226; Version 2.0
+            &#8226; Data &#8594; Intelligence &#8594; Decisions
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )

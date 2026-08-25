@@ -1,0 +1,213 @@
+"""
+===========================================================
+InsightAI - Prediction Explainability UI
+-----------------------------------------------------------
+Renders advanced Decision Tree prediction explanations.
+
+This module is isolated from the existing prediction UI.
+
+It does NOT modify:
+- core/ml.py
+- core/prediction.py
+- core/decision_tree.py
+- core/decision_tree_explainer.py
+===========================================================
+"""
+
+from __future__ import annotations
+
+import pandas as pd
+import streamlit as st
+
+
+def render_prediction_explanation(
+    explanation: dict,
+) -> None:
+    """
+    Render a complete Decision Tree explanation.
+    """
+
+    if not isinstance(explanation, dict):
+        raise TypeError(
+            "explanation must be a dictionary."
+        )
+
+    st.subheader("🎯 Prediction")
+
+    prediction = explanation.get(
+        "prediction_label",
+        "Unknown",
+    )
+
+    confidence = explanation.get(
+        "confidence"
+    )
+
+    st.metric(
+        "Predicted Outcome",
+        str(prediction),
+    )
+
+    if confidence is not None:
+
+        st.metric(
+            "Confidence",
+            f"{confidence * 100:.2f}%",
+        )
+
+    st.divider()
+
+    # =======================================================
+    # TOP FEATURES
+    # =======================================================
+
+    st.subheader("🔍 Top Decision Factors")
+
+    top_features = explanation.get(
+        "top_features"
+    )
+
+    if isinstance(
+        top_features,
+        pd.DataFrame,
+    ) and not top_features.empty:
+
+        display_df = top_features.copy()
+
+        if "Importance" in display_df.columns:
+
+            display_df["Importance"] = (
+                display_df["Importance"] * 100
+            ).round(2)
+
+            display_df["Importance"] = (
+                display_df["Importance"].astype(str)
+                + "%"
+            )
+
+        st.dataframe(
+            display_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    else:
+
+        st.info(
+            "Feature importance is not available."
+        )
+
+    # =======================================================
+    # DECISION PATH
+    # =======================================================
+
+    st.subheader("🌳 Decision Path")
+
+    decision_path = explanation.get(
+        "decision_path",
+        [],
+    )
+
+    if decision_path:
+
+        for index, step in enumerate(
+            decision_path,
+            start=1,
+        ):
+
+            feature = step.get(
+                "Feature",
+                "Unknown",
+            )
+
+            value = step.get(
+                "FeatureValue",
+                "Unknown",
+            )
+
+            threshold = step.get(
+                "Threshold",
+                "Unknown",
+            )
+
+            comparison = step.get(
+                "Comparison",
+                "unknown",
+            )
+
+            st.write(
+                f"**Step {index}:** "
+                f"`{feature} {comparison} {threshold}` "
+                f"(value: `{value}`)"
+            )
+
+    else:
+
+        st.info(
+            "No decision path available."
+        )
+
+    # =======================================================
+    # TREE INFORMATION
+    # =======================================================
+
+    st.subheader("🌲 Model Structure")
+
+    tree_info = explanation.get(
+        "tree_summary",
+        {},
+    )
+
+    if isinstance(tree_info, dict):
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.metric(
+                "Tree Nodes",
+                tree_info.get(
+                    "node_count",
+                    0,
+                ),
+            )
+
+        with col2:
+            st.metric(
+                "Leaf Nodes",
+                tree_info.get(
+                    "leaf_count",
+                    0,
+                ),
+            )
+
+        with col3:
+            st.metric(
+                "Tree Depth",
+                tree_info.get(
+                    "max_depth",
+                    0,
+                ),
+            )
+
+    # =======================================================
+    # LEARNED SPLITS
+    # =======================================================
+
+    splits = explanation.get(
+        "splits"
+    )
+
+    if isinstance(
+        splits,
+        pd.DataFrame,
+    ) and not splits.empty:
+
+        with st.expander(
+            "View learned tree splits"
+        ):
+
+            st.dataframe(
+                splits,
+                use_container_width=True,
+                hide_index=True,
+            )

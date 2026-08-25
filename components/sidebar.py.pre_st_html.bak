@@ -75,7 +75,7 @@ def reset_app_state() -> None:
 def _inject_sidebar_style() -> None:
     """Inject professional sidebar styling."""
 
-    st.html(
+    st.markdown(
         """
         <style>
 
@@ -88,7 +88,7 @@ def _inject_sidebar_style() -> None:
         }
 
         section[data-testid="stSidebar"] > div {
-            padding-top: 1rem;
+            padding-top: 1.2rem;
             padding-bottom: 1rem;
         }
 
@@ -101,50 +101,46 @@ def _inject_sidebar_style() -> None:
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 4px 2px 8px 2px;
             margin-bottom: 4px;
         }
 
         .insightai-logo {
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
-            border-radius: 13px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            font-size: 23px;
-            font-weight: 800;
+            font-size: 22px;
+            font-weight: 700;
 
             background:
                 linear-gradient(
                     135deg,
-                    #2563eb 0%,
-                    #4f46e5 48%,
-                    #7c3aed 100%
+                    #2563eb,
+                    #7c3aed
                 );
 
             color: white;
 
             box-shadow:
-                0 8px 22px
-                rgba(79, 70, 229, 0.28);
+                0 6px 18px
+                rgba(37, 99, 235, 0.25);
         }
 
         .insightai-title {
-            font-size: 1.38rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            line-height: 1.05;
+            font-size: 1.35rem;
+            font-weight: 750;
+            letter-spacing: -0.4px;
+            line-height: 1.1;
         }
 
         .insightai-subtitle {
-            font-size: 0.72rem;
-            opacity: 0.58;
-            margin-top: 4px;
-            letter-spacing: 0.01em;
+            font-size: 0.73rem;
+            opacity: 0.65;
+            margin-top: 3px;
         }
 
 
@@ -153,83 +149,38 @@ def _inject_sidebar_style() -> None:
            ================================================= */
 
         .sidebar-section-label {
-            font-size: 0.67rem;
-            font-weight: 800;
+            font-size: 0.68rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.25px;
-            opacity: 0.52;
-            margin-top: 8px;
-            margin-bottom: 7px;
+            letter-spacing: 1.2px;
+            opacity: 0.55;
+            margin-top: 10px;
+            margin-bottom: 6px;
         }
 
 
         /* =================================================
-           NAVIGATION
-           ================================================= */
-
-        section[data-testid="stSidebar"] div[role="radiogroup"] {
-            gap: 5px;
-        }
-
-        section[data-testid="stSidebar"] div[role="radiogroup"] > label {
-            border-radius: 11px;
-            padding: 8px 10px;
-            margin: 0;
-            transition:
-                background 0.18s ease,
-                transform 0.18s ease,
-                border 0.18s ease;
-        }
-
-        section[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {
-            background: rgba(99, 102, 241, 0.09);
-            transform: translateX(2px);
-        }
-
-        section[data-testid="stSidebar"] div[role="radiogroup"] > label
-        div[data-testid="stMarkdownContainer"] p {
-            font-size: 0.88rem;
-            font-weight: 650;
-            line-height: 1.2;
-            margin: 0;
-        }
-
-        section[data-testid="stSidebar"] div[role="radiogroup"]
-        input[type="radio"] {
-            accent-color: #6366f1;
-        }
-
-
-        /* =================================================
-           DATASET STATUS
+           STATUS CARD
            ================================================= */
 
         .dataset-status-card {
             border: 1px solid rgba(128, 128, 128, 0.18);
-            border-radius: 15px;
+            border-radius: 14px;
 
-            padding: 14px;
+            padding: 13px 14px;
 
             margin-top: 8px;
             margin-bottom: 10px;
 
             background:
-                linear-gradient(
-                    135deg,
-                    rgba(99, 102, 241, 0.075),
-                    rgba(37, 99, 235, 0.035)
-                );
-
-            box-shadow:
-                0 6px 18px
-                rgba(0, 0, 0, 0.035);
+                rgba(128, 128, 128, 0.055);
         }
 
         .status-row {
             display: flex;
             align-items: center;
             gap: 9px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .status-row:last-child {
@@ -237,9 +188,8 @@ def _inject_sidebar_style() -> None:
         }
 
         .status-icon {
-            width: 27px;
-            height: 27px;
-            min-width: 27px;
+            width: 25px;
+            height: 25px;
             border-radius: 8px;
 
             display: flex;
@@ -249,27 +199,23 @@ def _inject_sidebar_style() -> None:
             font-size: 13px;
 
             background:
-                rgba(99, 102, 241, 0.11);
+                rgba(37, 99, 235, 0.10);
         }
 
         .status-label {
-            font-size: 0.66rem;
-            font-weight: 650;
-            opacity: 0.50;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            font-size: 0.68rem;
+            opacity: 0.55;
         }
 
         .status-value {
             font-size: 0.78rem;
             font-weight: 650;
             word-break: break-word;
-            margin-top: 2px;
         }
 
 
         /* =================================================
-           STATUS BADGES
+           STATUS BADGE
            ================================================= */
 
         .status-badge {
@@ -281,20 +227,16 @@ def _inject_sidebar_style() -> None:
 
             border-radius: 999px;
 
-            font-size: 0.67rem;
-            font-weight: 750;
-            letter-spacing: 0.01em;
+            font-size: 0.68rem;
+            font-weight: 700;
         }
 
         .status-active {
-            background: rgba(34, 197, 94, 0.13);
-            color: #16a34a;
-            border: 1px solid rgba(34, 197, 94, 0.20);
+            background: rgba(34, 197, 94, 0.12);
         }
 
         .status-empty {
             background: rgba(148, 163, 184, 0.12);
-            border: 1px solid rgba(148, 163, 184, 0.16);
         }
 
         .status-dot {
@@ -306,34 +248,28 @@ def _inject_sidebar_style() -> None:
 
 
         /* =================================================
-           CHECKBOX
+           CONTROL AREA
            ================================================= */
 
-        section[data-testid="stSidebar"]
-        div[data-testid="stCheckbox"] {
-            padding: 3px 2px;
-        }
+        .sidebar-control-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.55;
 
-        section[data-testid="stSidebar"]
-        div[data-testid="stCheckbox"] label {
-            font-size: 0.86rem;
-            font-weight: 600;
+            margin-top: 8px;
+            margin-bottom: 3px;
         }
 
 
         /* =================================================
-           BUTTON
+           RESET BUTTON
            ================================================= */
 
         section[data-testid="stSidebar"]
-        button {
+        button[kind="secondary"] {
             border-radius: 10px;
-            font-weight: 650;
-        }
-
-        section[data-testid="stSidebar"]
-        button:hover {
-            border-color: rgba(99, 102, 241, 0.45);
         }
 
 
@@ -343,23 +279,23 @@ def _inject_sidebar_style() -> None:
 
         .insightai-footer {
             text-align: center;
-            padding-top: 7px;
+            padding-top: 6px;
         }
 
         .footer-version {
-            font-size: 0.69rem;
-            font-weight: 650;
-            opacity: 0.50;
+            font-size: 0.68rem;
+            opacity: 0.48;
         }
 
         .footer-caption {
-            font-size: 0.62rem;
-            opacity: 0.36;
+            font-size: 0.63rem;
+            opacity: 0.38;
             margin-top: 3px;
         }
 
         </style>
-        """
+        """,
+        unsafe_allow_html=True,
     )
 
 
@@ -370,7 +306,7 @@ def _inject_sidebar_style() -> None:
 def _render_brand() -> None:
     """Render InsightAI professional branding."""
 
-    st.html(
+    st.markdown(
         """
         <div class="insightai-brand">
 
@@ -389,8 +325,9 @@ def _render_brand() -> None:
             </div>
 
         </div>
-        """
-        )
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ===========================================================
@@ -427,13 +364,14 @@ def _render_dataset_status() -> None:
 
         file_display = "Upload a dataset to begin"
 
-    st.html(
+    st.markdown(
         '<div class="sidebar-section-label">'
         'Workspace Status'
-        '</div>'
-        )
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
-    st.html(
+    st.markdown(
         f"""
         <div class="dataset-status-card">
 
@@ -481,8 +419,9 @@ def _render_dataset_status() -> None:
             </div>
 
         </div>
-        """
-        )
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ===========================================================
@@ -523,10 +462,11 @@ def render_sidebar() -> str:
         # Navigation
         # ---------------------------------------------------
 
-        st.html(
+        st.markdown(
             '<div class="sidebar-section-label">'
             'Workspace'
-            '</div>'
+            '</div>',
+            unsafe_allow_html=True,
         )
 
         selected_page = st.radio(
@@ -557,10 +497,11 @@ def render_sidebar() -> str:
         # Preferences
         # ---------------------------------------------------
 
-        st.html(
+        st.markdown(
             '<div class="sidebar-section-label">'
             'Preferences'
-            '</div>'
+            '</div>',
+            unsafe_allow_html=True,
         )
 
         st.checkbox(
@@ -574,10 +515,11 @@ def render_sidebar() -> str:
         # Application Controls
         # ---------------------------------------------------
 
-        st.html(
+        st.markdown(
             '<div class="sidebar-section-label">'
             'Application'
-            '</div>'
+            '</div>',
+            unsafe_allow_html=True,
         )
 
         if st.button(
@@ -595,7 +537,7 @@ def render_sidebar() -> str:
 
         st.divider()
 
-        st.html(
+        st.markdown(
             f"""
             <div class="insightai-footer">
 
@@ -608,7 +550,8 @@ def render_sidebar() -> str:
                 </div>
 
             </div>
-            """
+            """,
+            unsafe_allow_html=True,
         )
 
     return selected_page
