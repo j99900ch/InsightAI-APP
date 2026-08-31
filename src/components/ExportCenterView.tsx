@@ -10,6 +10,9 @@ import {
   Package,
   Layers,
   Database,
+  FolderGit2,
+  ExternalLink,
+  Laptop,
 } from 'lucide-react';
 import { DatasetProfile } from '../types';
 
@@ -17,12 +20,16 @@ interface ExportCenterViewProps {
   data: Record<string, any>[];
   datasetName: string;
   profile: DatasetProfile;
+  onOpenGitHubSync?: () => void;
+  onOpenInstallModal?: () => void;
 }
 
 export const ExportCenterView: React.FC<ExportCenterViewProps> = ({
   data,
   datasetName,
   profile,
+  onOpenGitHubSync,
+  onOpenInstallModal,
 }) => {
   const [customFilename, setCustomFilename] = useState<string>(
     `${datasetName.replace(/[^a-zA-Z0-9_-]/g, '_')}_Export`
@@ -207,6 +214,68 @@ export const ExportCenterView: React.FC<ExportCenterViewProps> = ({
           Export All Formats
         </button>
       </div>
+
+      {/* Desktop App Installation Card */}
+      {onOpenInstallModal && (
+        <div className="bg-slate-900 border border-slate-700/80 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+              <Laptop className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-white">Install InsightAI Desktop App (PC)</h3>
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  PWA
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Install as a native application on Windows, Mac, or Linux for instant taskbar access and standalone workspace.
+              </p>
+            </div>
+          </div>
+
+          <button
+            id="btn-export-open-install"
+            onClick={onOpenInstallModal}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition-all shrink-0"
+          >
+            <Download className="w-4 h-4" />
+            <span>Install on PC</span>
+          </button>
+        </div>
+      )}
+
+      {/* GitHub Repository Sync Card */}
+      {onOpenGitHubSync && (
+        <div className="bg-slate-900 border border-slate-700/80 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 shrink-0">
+              <FolderGit2 className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-white">GitHub Project Synchronization</h3>
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  Ready
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Commit & push your models, reports, clean datasets, and codebase directly to your GitHub repository.
+              </p>
+            </div>
+          </div>
+
+          <button
+            id="btn-export-open-github"
+            onClick={onOpenGitHubSync}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/80 hover:border-blue-500/50 text-white text-xs font-bold shadow-md transition-all shrink-0"
+          >
+            <FolderGit2 className="w-4 h-4 text-blue-400" />
+            <span>Open GitHub Sync Modal</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -15,7 +15,10 @@ import {
   Check,
   RotateCcw,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Database,
+  Trash2,
 } from 'lucide-react';
 import { ActiveTab, DatasetProfile, MLResult, ForecastResult, DecisionResult, ChatMessage } from '../types';
 import { generateHeuristicAgentResponse } from '../utils/aiChatFallback';
@@ -29,6 +32,11 @@ interface FloatingChatWidgetProps {
   forecastResult?: ForecastResult | null;
   decisionResult?: DecisionResult | null;
   onNavigateTab: (tab: ActiveTab) => void;
+  onClose?: () => void;
+  onBack?: () => void;
+  onForward?: () => void;
+  canGoBack?: boolean;
+  canGoForward?: boolean;
 }
 
 export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
@@ -40,6 +48,11 @@ export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
   forecastResult,
   decisionResult,
   onNavigateTab,
+  onClose,
+  onBack,
+  onForward,
+  canGoBack = false,
+  canGoForward = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -245,6 +258,10 @@ export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleDismissMessage = (id: string) => {
+    setMessages((prev) => prev.filter((m) => m.id !== id));
+  };
+
   // If closed, render floating trigger button
   if (!isOpen) {
     return (
@@ -269,58 +286,84 @@ export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
       id="floating-chat-window"
       className={`fixed z-50 transition-all duration-200 flex flex-col bg-slate-900/95 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden ${
         isExpanded
-          ? 'bottom-4 right-4 w-[calc(100vw-32px)] md:w-[700px] h-[calc(100vh-80px)]'
-          : 'bottom-4 right-4 w-[calc(100vw-32px)] sm:w-[420px] h-[560px]'
+          ? 'bottom-4 right-4 w-[calc(100vw-32px)] md:w-[700px] h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)]'
+          : 'bottom-4 right-4 w-[calc(100vw-32px)] sm:w-[420px] h-[min(560px,calc(100vh-2rem))] max-h-[calc(100vh-2rem)]'
       }`}
     >
       {/* Header */}
-      <div className="p-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+      <div className="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between shrink-0 gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
             <Bot className="w-4 h-4" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-xs text-white">InsightAI Copilot</h3>
-              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-bold text-xs text-white truncate">AI Copilot</h3>
+              <span className="text-[8px] px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                 LIVE
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 truncate max-w-[200px]">
-              {datasetName} • {profile.rows} rows
+            <p className="text-[10px] text-slate-400 truncate">
+              {datasetName}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        {/* Feature Navigation (<, >, X) and Controls */}
+        <div className="flex items-center gap-1 shrink-0">
+          {/* Back & Ahead navigation */}
+          <div className="flex items-center bg-slate-900 rounded-lg border border-slate-800 p-0.5">
+            <button
+              id="btn-floating-nav-back"
+              onClick={onBack}
+              disabled={!canGoBack}
+              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition-colors"
+              title="Back to previous feature (<)"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              id="btn-floating-nav-ahead"
+              onClick={onForward}
+              disabled={!canGoForward}
+              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition-colors"
+              title="Ahead to next feature (>)"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           <button
             onClick={() => onNavigateTab('chat')}
-            className="text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium transition-colors"
+            className="text-[10px] px-1.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium transition-colors hidden sm:block"
             title="Open Full Chat View"
           >
             Full View
           </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
+            className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
             title={isExpanded ? 'Restore Size' : 'Expand Window'}
           >
             {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
+            className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
             title="Minimize to Floating Button"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
           <button
             id="btn-floating-chat-close"
-            onClick={() => setIsOpen(false)}
-            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+            onClick={() => {
+              setIsOpen(false);
+              if (onClose) onClose();
+            }}
+            className="p-1 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
             title="Cross / Close Copilot (X)"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -334,7 +377,7 @@ export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
           return (
             <div
               key={message.id}
-              className={`flex gap-2.5 max-w-full ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
+              className={`flex gap-2.5 max-w-full group ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
             >
               <div
                 className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
@@ -344,14 +387,25 @@ export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
                 {isUser ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
               </div>
 
-              <div className="space-y-1.5 max-w-[85%]">
+              <div className="space-y-1.5 max-w-[85%] relative">
                 <div
-                  className={`p-3 rounded-xl leading-relaxed ${
+                  className={`p-3 rounded-xl leading-relaxed relative ${
                     isUser
                       ? 'bg-blue-600 text-white rounded-tr-none'
                       : 'bg-slate-950/80 text-slate-200 border border-slate-800/90 rounded-tl-none'
                   }`}
                 >
+                  {/* Dismiss cross button on message */}
+                  {!isUser && (
+                    <button
+                      onClick={() => handleDismissMessage(message.id)}
+                      className="absolute top-2 right-2 p-1 text-slate-400 hover:text-red-400 hover:bg-slate-800/80 rounded transition-colors opacity-70 hover:opacity-100"
+                      title="Cross / Dismiss this message (X)"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+
                   {message.isStreaming && !message.content && (
                     <div className="flex items-center gap-1.5 text-slate-400 py-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
@@ -361,7 +415,7 @@ export const FloatingChatWidget: React.FC<FloatingChatWidgetProps> = ({
                   )}
 
                   {message.content && (
-                    <div className="prose prose-invert prose-xs max-w-none text-slate-200 prose-headings:text-slate-100 prose-headings:font-bold prose-headings:my-1.5 prose-p:my-1 prose-ul:my-1 prose-code:text-blue-300 prose-code:bg-slate-900 prose-code:px-1 prose-code:py-0.5 prose-code:rounded">
+                    <div className="prose prose-invert prose-xs max-w-none text-slate-200 pr-4 prose-headings:text-slate-100 prose-headings:font-bold prose-headings:my-1.5 prose-p:my-1 prose-ul:my-1 prose-code:text-blue-300 prose-code:bg-slate-900 prose-code:px-1 prose-code:py-0.5 prose-code:rounded">
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                   )}

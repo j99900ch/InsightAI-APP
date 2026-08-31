@@ -17,7 +17,9 @@ import { ExportCenterView } from './components/ExportCenterView';
 import { ActiveTab, DatasetProfile, MLResult, DecisionResult, ForecastResult } from './types';
 import { SAMPLE_DATASETS } from './utils/sampleData';
 import { profileDataset } from './utils/analysis';
-import { Database, ChevronRight, ChevronLeft, Bot, Sparkles, X } from 'lucide-react';
+import { Database, ChevronRight, ChevronLeft, Bot, Sparkles, X, FolderGit2, Download, Laptop } from 'lucide-react';
+import { GitHubSyncModal } from './components/GitHubSyncModal';
+import { InstallAppModal } from './components/InstallAppModal';
 
 export function App() {
   const [tabHistory, setTabHistory] = useState<ActiveTab[]>(['overview']);
@@ -31,6 +33,8 @@ export function App() {
   const [mlResult, setMlResult] = useState<MLResult | null>(null);
   const [forecastResult, setForecastResult] = useState<ForecastResult | null>(null);
   const [decisionResult, setDecisionResult] = useState<DecisionResult | null>(null);
+  const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
   // Navigation handlers with history tracking
   const navigateToTab = (tab: ActiveTab) => {
@@ -98,6 +102,8 @@ export function App() {
         datasetName={datasetName}
         profile={profile}
         onLoadSample={handleLoadSample}
+        onOpenGitHubSync={() => setIsGitHubModalOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -158,7 +164,27 @@ export function App() {
           </div>
 
           {/* Header Action Shortcuts & Preset Selector */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            <button
+              id="btn-header-install-app"
+              onClick={() => setIsInstallModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-300 text-xs font-semibold transition-all shadow-sm group"
+              title="Install InsightAI as a Desktop App on your PC"
+            >
+              <Download className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline">Install to PC</span>
+            </button>
+
+            <button
+              id="btn-header-github-sync"
+              onClick={() => setIsGitHubModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/40 text-slate-200 text-xs font-semibold transition-all shadow-sm group"
+              title="Sync & Push project to GitHub"
+            >
+              <FolderGit2 className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline">GitHub</span>
+            </button>
+
             {activeTab !== 'chat' && (
               <button
                 id="btn-header-open-chat"
@@ -290,6 +316,8 @@ export function App() {
                 data={data}
                 datasetName={datasetName}
                 profile={profile}
+                onOpenGitHubSync={() => setIsGitHubModalOpen(true)}
+                onOpenInstallModal={() => setIsInstallModalOpen(true)}
               />
             )}
           </div>
@@ -306,8 +334,25 @@ export function App() {
             forecastResult={forecastResult}
             decisionResult={decisionResult}
             onNavigateTab={navigateToTab}
+            onBack={handleNavigateBack}
+            onForward={handleNavigateForward}
+            canGoBack={canGoBack}
+            canGoForward={canGoForward}
           />
         )}
+
+        {/* Clickable GitHub Sync & Push Modal */}
+        <GitHubSyncModal
+          isOpen={isGitHubModalOpen}
+          onClose={() => setIsGitHubModalOpen(false)}
+          datasetName={datasetName}
+        />
+
+        {/* Clickable Install Desktop App Modal */}
+        <InstallAppModal
+          isOpen={isInstallModalOpen}
+          onClose={() => setIsInstallModalOpen(false)}
+        />
       </div>
     </div>
   );

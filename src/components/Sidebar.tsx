@@ -14,6 +14,8 @@ import {
   Download,
   Database,
   Layers,
+  FolderGit2,
+  Laptop,
 } from 'lucide-react';
 import { ActiveTab, DatasetProfile } from '../types';
 
@@ -23,6 +25,8 @@ interface SidebarProps {
   datasetName: string;
   profile: DatasetProfile;
   onLoadSample: (sampleId: string) => void;
+  onOpenGitHubSync?: () => void;
+  onOpenInstallModal?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -31,6 +35,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   datasetName,
   profile,
   onLoadSample,
+  onOpenGitHubSync,
+  onOpenInstallModal,
 }) => {
   const navItems: { id: ActiveTab; label: string; icon: React.ElementType; badge?: string }[] = [
     { id: 'overview', label: 'Dataset Overview', icon: LayoutDashboard },
@@ -117,27 +123,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
-      {/* Quick Sample Switcher Footer */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/40">
-        <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-1 mb-1.5 flex items-center gap-1">
-          <Layers className="w-3 h-3 text-slate-400" />
-          Load Demo Data
-        </div>
+      {/* Quick Sample Switcher & Actions Footer */}
+      <div className="p-3 border-t border-slate-800 bg-slate-950/40 space-y-2">
         <div className="grid grid-cols-2 gap-1.5">
-          <button
-            id="btn-sample-sales"
-            onClick={() => onLoadSample('sales-growth')}
-            className="text-[11px] font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 px-2 py-1.5 rounded-md text-left truncate transition-colors"
-          >
-            Sales & Revenue
-          </button>
-          <button
-            id="btn-sample-churn"
-            onClick={() => onLoadSample('customer-churn')}
-            className="text-[11px] font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 px-2 py-1.5 rounded-md text-left truncate transition-colors"
-          >
-            Customer Churn
-          </button>
+          {onOpenInstallModal && (
+            <button
+              id="btn-sidebar-install-app"
+              onClick={onOpenInstallModal}
+              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/20 hover:border-blue-500/40 text-blue-300 transition-all text-xs font-semibold shadow-sm group"
+              title="Install InsightAI as a Desktop App on PC"
+            >
+              <Download className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+              <span>Install App</span>
+            </button>
+          )}
+
+          {onOpenGitHubSync && (
+            <button
+              id="btn-sidebar-github-sync"
+              onClick={onOpenGitHubSync}
+              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-blue-500/40 text-slate-200 transition-all text-xs font-semibold shadow-sm group"
+              title="Sync & Push to GitHub"
+            >
+              <FolderGit2 className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+              <span>GitHub</span>
+            </button>
+          )}
+        </div>
+
+        <div>
+          <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-1 mb-1.5 flex items-center gap-1">
+            <Layers className="w-3 h-3 text-slate-400" />
+            Load Demo Data
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            <button
+              id="btn-sample-sales"
+              onClick={() => onLoadSample('sales-growth')}
+              className="text-[11px] font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 px-2 py-1.5 rounded-md text-left truncate transition-colors"
+            >
+              Sales & Revenue
+            </button>
+            <button
+              id="btn-sample-churn"
+              onClick={() => onLoadSample('customer-churn')}
+              className="text-[11px] font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 px-2 py-1.5 rounded-md text-left truncate transition-colors"
+            >
+              Customer Churn
+            </button>
+          </div>
         </div>
       </div>
     </aside>
