@@ -1,0 +1,6 @@
+{
+  "name": "InsightAI - Data Analytics & Decision Intelligence",
+  "description": "Comprehensive data analysis, automated machine learning, interactive visualizations, forecasting, and decision intelligence platform.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

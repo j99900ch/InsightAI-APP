@@ -1,0 +1,112 @@
+export interface SampleDatasetInfo {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  defaultDateCol?: string;
+  defaultTargetCol?: string;
+  defaultQuestion?: string;
+  data: Record<string, any>[];
+}
+
+export const SAMPLE_DATASETS: SampleDatasetInfo[] = [
+  {
+    id: 'sales-growth',
+    name: 'Enterprise Sales & Revenue Performance',
+    description: 'Multi-year quarterly financial metrics, product categories, operating costs, and profit margins.',
+    category: 'Finance & Sales',
+    defaultDateCol: 'Date',
+    defaultTargetCol: 'Revenue',
+    defaultQuestion: 'Should we increase sales investment for next year?',
+    data: [
+      { Date: '2020-03-31', Region: 'North America', Category: 'Enterprise Software', UnitsSold: 420, UnitPrice: 1200, Revenue: 504000, MarketingSpend: 62000, OperatingCost: 240000, Profit: 202000, CustomerSatisfaction: 88 },
+      { Date: '2020-06-30', Region: 'North America', Category: 'Cloud Services', UnitsSold: 580, UnitPrice: 850, Revenue: 493000, MarketingSpend: 71000, OperatingCost: 215000, Profit: 207000, CustomerSatisfaction: 91 },
+      { Date: '2020-09-30', Region: 'Europe', Category: 'Enterprise Software', UnitsSold: 390, UnitPrice: 1200, Revenue: 468000, MarketingSpend: 58000, OperatingCost: 230000, Profit: 180000, CustomerSatisfaction: 85 },
+      { Date: '2020-12-31', Region: 'Asia Pacific', Category: 'Hardware', UnitsSold: 820, UnitPrice: 650, Revenue: 533000, MarketingSpend: 84000, OperatingCost: 290000, Profit: 159000, CustomerSatisfaction: 82 },
+      { Date: '2021-03-31', Region: 'North America', Category: 'Enterprise Software', UnitsSold: 510, UnitPrice: 1250, Revenue: 637500, MarketingSpend: 75000, OperatingCost: 260000, Profit: 302500, CustomerSatisfaction: 89 },
+      { Date: '2021-06-30', Region: 'Europe', Category: 'Cloud Services', UnitsSold: 720, UnitPrice: 900, Revenue: 648000, MarketingSpend: 82000, OperatingCost: 245000, Profit: 321000, CustomerSatisfaction: 93 },
+      { Date: '2021-09-30', Region: 'Asia Pacific', Category: 'Cloud Services', UnitsSold: 660, UnitPrice: 900, Revenue: 594000, MarketingSpend: 79000, OperatingCost: 235000, Profit: 280000, CustomerSatisfaction: 87 },
+      { Date: '2021-12-31', Region: 'North America', Category: 'Hardware', UnitsSold: 940, UnitPrice: 700, Revenue: 658000, MarketingSpend: 95000, OperatingCost: 310000, Profit: 253000, CustomerSatisfaction: 84 },
+      { Date: '2022-03-31', Region: 'Europe', Category: 'Enterprise Software', UnitsSold: 610, UnitPrice: 1300, Revenue: 793000, MarketingSpend: 88000, OperatingCost: 280000, Profit: 425000, CustomerSatisfaction: 92 },
+      { Date: '2022-06-30', Region: 'North America', Category: 'Cloud Services', UnitsSold: 890, UnitPrice: 950, Revenue: 845500, MarketingSpend: 99000, OperatingCost: 270000, Profit: 476500, CustomerSatisfaction: 95 },
+      { Date: '2022-09-30', Region: 'Asia Pacific', Category: 'Enterprise Software', UnitsSold: 580, UnitPrice: 1300, Revenue: 754000, MarketingSpend: 91000, OperatingCost: 295000, Profit: 368000, CustomerSatisfaction: 89 },
+      { Date: '2022-12-31', Region: 'Europe', Category: 'Hardware', UnitsSold: 1100, UnitPrice: 720, Revenue: 792000, MarketingSpend: 110000, OperatingCost: 340000, Profit: 342000, CustomerSatisfaction: 86 },
+      { Date: '2023-03-31', Region: 'North America', Category: 'Enterprise Software', UnitsSold: 750, UnitPrice: 1350, Revenue: 1012500, MarketingSpend: 105000, OperatingCost: 310000, Profit: 597500, CustomerSatisfaction: 94 },
+      { Date: '2023-06-30', Region: 'North America', Category: 'Cloud Services', UnitsSold: 1080, UnitPrice: 980, Revenue: 1058400, MarketingSpend: 118000, OperatingCost: 295000, Profit: 645400, CustomerSatisfaction: 96 },
+      { Date: '2023-09-30', Region: 'Europe', Category: 'Cloud Services', UnitsSold: 920, UnitPrice: 980, Revenue: 901600, MarketingSpend: 108000, OperatingCost: 285000, Profit: 508600, CustomerSatisfaction: 92 },
+      { Date: '2023-12-31', Region: 'Asia Pacific', Category: 'Hardware', UnitsSold: 1280, UnitPrice: 750, Revenue: 960000, MarketingSpend: 125000, OperatingCost: 365000, Profit: 470000, CustomerSatisfaction: 88 },
+      { Date: '2024-03-31', Region: 'North America', Category: 'Enterprise Software', UnitsSold: 880, UnitPrice: 1400, Revenue: 1232000, MarketingSpend: 120000, OperatingCost: 335000, Profit: 777000, CustomerSatisfaction: 95 },
+      { Date: '2024-06-30', Region: 'Europe', Category: 'Cloud Services', UnitsSold: 1250, UnitPrice: 1020, Revenue: 1275000, MarketingSpend: 135000, OperatingCost: 320000, Profit: 820000, CustomerSatisfaction: 97 },
+      { Date: '2024-09-30', Region: 'North America', Category: 'Cloud Services', UnitsSold: 1340, UnitPrice: 1020, Revenue: 1366800, MarketingSpend: 142000, OperatingCost: 330000, Profit: 894800, CustomerSatisfaction: 96 },
+      { Date: '2024-12-31', Region: 'Asia Pacific', Category: 'Enterprise Software', UnitsSold: 960, UnitPrice: 1400, Revenue: 1344000, MarketingSpend: 138000, OperatingCost: 350000, Profit: 856000, CustomerSatisfaction: 91 },
+    ],
+  },
+  {
+    id: 'customer-churn',
+    name: 'SaaS Customer Retention & Churn Risk',
+    description: 'Subscription customer records with usage behavior, monthly charges, support tickets, and churn labels.',
+    category: 'Customer Intelligence',
+    defaultDateCol: 'JoinDate',
+    defaultTargetCol: 'Churned',
+    defaultQuestion: 'What features drive customer churn risk?',
+    data: [
+      { CustomerID: 'CUST-101', JoinDate: '2022-01-15', Plan: 'Premium', TenureMonths: 24, MonthlyCharges: 149.00, TotalSupportCalls: 1, DataUsageGB: 450, PaymentMethod: 'Credit Card', Churned: 'No' },
+      { CustomerID: 'CUST-102', JoinDate: '2023-04-10', Plan: 'Basic', TenureMonths: 4, MonthlyCharges: 29.00, TotalSupportCalls: 7, DataUsageGB: 45, PaymentMethod: 'Electronic Check', Churned: 'Yes' },
+      { CustomerID: 'CUST-103', JoinDate: '2021-11-20', Plan: 'Enterprise', TenureMonths: 36, MonthlyCharges: 499.00, TotalSupportCalls: 2, DataUsageGB: 1200, PaymentMethod: 'Bank Transfer', Churned: 'No' },
+      { CustomerID: 'CUST-104', JoinDate: '2023-09-05', Plan: 'Basic', TenureMonths: 2, MonthlyCharges: 29.00, TotalSupportCalls: 5, DataUsageGB: 20, PaymentMethod: 'Electronic Check', Churned: 'Yes' },
+      { CustomerID: 'CUST-105', JoinDate: '2022-08-14', Plan: 'Standard', TenureMonths: 18, MonthlyCharges: 79.00, TotalSupportCalls: 3, DataUsageGB: 280, PaymentMethod: 'Credit Card', Churned: 'No' },
+      { CustomerID: 'CUST-106', JoinDate: '2023-02-19', Plan: 'Standard', TenureMonths: 6, MonthlyCharges: 79.00, TotalSupportCalls: 6, DataUsageGB: 110, PaymentMethod: 'Electronic Check', Churned: 'Yes' },
+      { CustomerID: 'CUST-107', JoinDate: '2021-05-30', Plan: 'Premium', TenureMonths: 32, MonthlyCharges: 149.00, TotalSupportCalls: 0, DataUsageGB: 680, PaymentMethod: 'Credit Card', Churned: 'No' },
+      { CustomerID: 'CUST-108', JoinDate: '2023-11-01', Plan: 'Basic', TenureMonths: 1, MonthlyCharges: 29.00, TotalSupportCalls: 4, DataUsageGB: 30, PaymentMethod: 'Electronic Check', Churned: 'Yes' },
+      { CustomerID: 'CUST-109', JoinDate: '2022-03-22', Plan: 'Enterprise', TenureMonths: 28, MonthlyCharges: 499.00, TotalSupportCalls: 1, DataUsageGB: 1540, PaymentMethod: 'Bank Transfer', Churned: 'No' },
+      { CustomerID: 'CUST-110', JoinDate: '2022-10-18', Plan: 'Standard', TenureMonths: 14, MonthlyCharges: 79.00, TotalSupportCalls: 2, DataUsageGB: 310, PaymentMethod: 'Credit Card', Churned: 'No' },
+      { CustomerID: 'CUST-111', JoinDate: '2023-07-12', Plan: 'Basic', TenureMonths: 5, MonthlyCharges: 35.00, TotalSupportCalls: 8, DataUsageGB: 65, PaymentMethod: 'Electronic Check', Churned: 'Yes' },
+      { CustomerID: 'CUST-112', JoinDate: '2022-06-04', Plan: 'Premium', TenureMonths: 20, MonthlyCharges: 149.00, TotalSupportCalls: 2, DataUsageGB: 520, PaymentMethod: 'Credit Card', Churned: 'No' },
+      { CustomerID: 'CUST-113', JoinDate: '2023-01-29', Plan: 'Standard', TenureMonths: 11, MonthlyCharges: 85.00, TotalSupportCalls: 5, DataUsageGB: 190, PaymentMethod: 'Credit Card', Churned: 'Yes' },
+      { CustomerID: 'CUST-114', JoinDate: '2021-08-15', Plan: 'Enterprise', TenureMonths: 38, MonthlyCharges: 549.00, TotalSupportCalls: 0, DataUsageGB: 1800, PaymentMethod: 'Bank Transfer', Churned: 'No' },
+      { CustomerID: 'CUST-115', JoinDate: '2023-05-20', Plan: 'Basic', TenureMonths: 3, MonthlyCharges: 29.00, TotalSupportCalls: 6, DataUsageGB: 40, PaymentMethod: 'Electronic Check', Churned: 'Yes' },
+    ],
+  },
+  {
+    id: 'employee-performance',
+    name: 'Workforce Attrition & Compensation Analytics',
+    description: 'Human resources metrics including department, salary, performance rating, years at company, and promotion history.',
+    category: 'Human Resources',
+    defaultDateCol: 'HireDate',
+    defaultTargetCol: 'PerformanceScore',
+    defaultQuestion: 'Is employee performance correlated with compensation and tenure?',
+    data: [
+      { EmployeeID: 'EMP-01', HireDate: '2018-04-01', Department: 'Engineering', RoleLevel: 'Senior', AnnualSalary: 135000, YearsAtCompany: 6, ProjectsCompleted: 24, TrainingHours: 45, PerformanceScore: 92 },
+      { EmployeeID: 'EMP-02', HireDate: '2021-08-15', Department: 'Sales', RoleLevel: 'Mid', AnnualSalary: 88000, YearsAtCompany: 3, ProjectsCompleted: 18, TrainingHours: 30, PerformanceScore: 84 },
+      { EmployeeID: 'EMP-03', HireDate: '2019-02-10', Department: 'Product', RoleLevel: 'Lead', AnnualSalary: 145000, YearsAtCompany: 5, ProjectsCompleted: 29, TrainingHours: 50, PerformanceScore: 95 },
+      { EmployeeID: 'EMP-04', HireDate: '2023-01-09', Department: 'Marketing', RoleLevel: 'Junior', AnnualSalary: 62000, YearsAtCompany: 1, ProjectsCompleted: 8, TrainingHours: 20, PerformanceScore: 76 },
+      { EmployeeID: 'EMP-05', HireDate: '2020-06-22', Department: 'Engineering', RoleLevel: 'Mid', AnnualSalary: 105000, YearsAtCompany: 4, ProjectsCompleted: 19, TrainingHours: 35, PerformanceScore: 88 },
+      { EmployeeID: 'EMP-06', HireDate: '2017-11-05', Department: 'Executive', RoleLevel: 'Director', AnnualSalary: 185000, YearsAtCompany: 7, ProjectsCompleted: 40, TrainingHours: 60, PerformanceScore: 96 },
+      { EmployeeID: 'EMP-07', HireDate: '2022-03-14', Department: 'Sales', RoleLevel: 'Junior', AnnualSalary: 58000, YearsAtCompany: 2, ProjectsCompleted: 11, TrainingHours: 25, PerformanceScore: 79 },
+      { EmployeeID: 'EMP-08', HireDate: '2019-09-30', Department: 'Operations', RoleLevel: 'Senior', AnnualSalary: 112000, YearsAtCompany: 5, ProjectsCompleted: 26, TrainingHours: 40, PerformanceScore: 90 },
+      { EmployeeID: 'EMP-09', HireDate: '2021-12-01', Department: 'Engineering', RoleLevel: 'Junior', AnnualSalary: 78000, YearsAtCompany: 3, ProjectsCompleted: 14, TrainingHours: 30, PerformanceScore: 82 },
+      { EmployeeID: 'EMP-10', HireDate: '2018-07-18', Department: 'Product', RoleLevel: 'Senior', AnnualSalary: 130000, YearsAtCompany: 6, ProjectsCompleted: 27, TrainingHours: 48, PerformanceScore: 93 },
+    ],
+  },
+  {
+    id: 'real-estate',
+    name: 'Residential Real Estate Valuation',
+    description: 'Property transaction records with square footage, bedrooms, bathrooms, location scores, and sale prices.',
+    category: 'Real Estate & Assets',
+    defaultDateCol: 'SaleDate',
+    defaultTargetCol: 'SalePrice',
+    defaultQuestion: 'Should we invest in prime suburban real estate?',
+    data: [
+      { PropertyID: 'PROP-01', SaleDate: '2021-01-10', Neighborhood: 'Suburban Green', SquareFeet: 2150, Bedrooms: 3, Bathrooms: 2.5, YearBuilt: 2012, DistanceToCityMiles: 12.4, SalePrice: 465000 },
+      { PropertyID: 'PROP-02', SaleDate: '2021-05-18', Neighborhood: 'Downtown Core', SquareFeet: 1100, Bedrooms: 2, Bathrooms: 2.0, YearBuilt: 2018, DistanceToCityMiles: 1.2, SalePrice: 580000 },
+      { PropertyID: 'PROP-03', SaleDate: '2021-09-22', Neighborhood: 'Westside Hills', SquareFeet: 3400, Bedrooms: 5, Bathrooms: 4.0, YearBuilt: 2008, DistanceToCityMiles: 18.5, SalePrice: 820000 },
+      { PropertyID: 'PROP-04', SaleDate: '2022-02-14', Neighborhood: 'Suburban Green', SquareFeet: 1850, Bedrooms: 3, Bathrooms: 2.0, YearBuilt: 2010, DistanceToCityMiles: 14.1, SalePrice: 425000 },
+      { PropertyID: 'PROP-05', SaleDate: '2022-07-30', Neighborhood: 'Metro East', SquareFeet: 1450, Bedrooms: 2, Bathrooms: 1.5, YearBuilt: 1998, DistanceToCityMiles: 6.8, SalePrice: 385000 },
+      { PropertyID: 'PROP-06', SaleDate: '2022-11-15', Neighborhood: 'Westside Hills', SquareFeet: 2900, Bedrooms: 4, Bathrooms: 3.5, YearBuilt: 2015, DistanceToCityMiles: 16.2, SalePrice: 775000 },
+      { PropertyID: 'PROP-07', SaleDate: '2023-03-20', Neighborhood: 'Downtown Core', SquareFeet: 950, Bedrooms: 1, Bathrooms: 1.0, YearBuilt: 2020, DistanceToCityMiles: 0.8, SalePrice: 495000 },
+      { PropertyID: 'PROP-08', SaleDate: '2023-08-11', Neighborhood: 'Suburban Green', SquareFeet: 2500, Bedrooms: 4, Bathrooms: 3.0, YearBuilt: 2016, DistanceToCityMiles: 11.5, SalePrice: 540000 },
+      { PropertyID: 'PROP-09', SaleDate: '2023-12-05', Neighborhood: 'Metro East', SquareFeet: 1750, Bedrooms: 3, Bathrooms: 2.0, YearBuilt: 2005, DistanceToCityMiles: 7.2, SalePrice: 450000 },
+      { PropertyID: 'PROP-10', SaleDate: '2024-04-18', Neighborhood: 'Westside Hills', SquareFeet: 3800, Bedrooms: 5, Bathrooms: 4.5, YearBuilt: 2019, DistanceToCityMiles: 17.0, SalePrice: 950000 },
+    ],
+  },
+];
