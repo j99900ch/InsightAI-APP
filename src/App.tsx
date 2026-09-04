@@ -14,14 +14,16 @@ import { BusinessInsightsView } from './components/BusinessInsightsView';
 import { ReportStudioView } from './components/ReportStudioView';
 import { ExportCenterView } from './components/ExportCenterView';
 
-import { ActiveTab, DatasetProfile, MLResult, DecisionResult, ForecastResult } from './types';
+import { ActiveTab, DatasetProfile, MLResult, DecisionResult, ForecastResult, AppFrontendMode } from './types';
 import { SAMPLE_DATASETS } from './utils/sampleData';
 import { profileDataset } from './utils/analysis';
-import { Database, ChevronRight, ChevronLeft, Bot, Sparkles, X, FolderGit2, Download, Laptop } from 'lucide-react';
+import { Database, ChevronRight, ChevronLeft, Bot, Sparkles, X, FolderGit2, Download, Laptop, Cpu } from 'lucide-react';
 import { GitHubSyncModal } from './components/GitHubSyncModal';
 import { InstallAppModal } from './components/InstallAppModal';
+import { Frontend2ForecastingLab } from './components/Frontend2ForecastingLab';
 
 export function App() {
+  const [frontendMode, setFrontendMode] = useState<AppFrontendMode>('frontend-1-analytics');
   const [tabHistory, setTabHistory] = useState<ActiveTab[]>(['overview']);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
   const activeTab = tabHistory[historyIndex] || 'overview';
@@ -93,6 +95,10 @@ export function App() {
     }
   };
 
+  if (frontendMode === 'frontend-2-deep-forecasting') {
+    return <Frontend2ForecastingLab onSwitchToFrontend1={() => setFrontendMode('frontend-1-analytics')} />;
+  }
+
   return (
     <div className="flex h-screen w-full bg-slate-950 text-slate-100 font-sans overflow-hidden">
       {/* Navigation Sidebar */}
@@ -104,6 +110,7 @@ export function App() {
         onLoadSample={handleLoadSample}
         onOpenGitHubSync={() => setIsGitHubModalOpen(true)}
         onOpenInstallModal={() => setIsInstallModalOpen(true)}
+        onSwitchToFrontend2={() => setFrontendMode('frontend-2-deep-forecasting')}
       />
 
       {/* Main Content Area */}
@@ -165,6 +172,16 @@ export function App() {
 
           {/* Header Action Shortcuts & Preset Selector */}
           <div className="flex items-center gap-2">
+            <button
+              id="btn-header-switch-to-frontend-2"
+              onClick={() => setFrontendMode('frontend-2-deep-forecasting')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/40 border border-indigo-500/40 text-indigo-300 text-xs font-semibold transition-all shadow-sm group"
+              title="Switch to Frontend 2: Deep Forecaster & Training Lab"
+            >
+              <Cpu className="w-3.5 h-3.5 text-indigo-400 group-hover:scale-110 transition-transform" />
+              <span className="hidden md:inline">Frontend 2: Deep Forecaster</span>
+            </button>
+
             <button
               id="btn-header-install-app"
               onClick={() => setIsInstallModalOpen(true)}

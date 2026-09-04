@@ -18,6 +18,7 @@ import {
   Laptop,
 } from 'lucide-react';
 import { ActiveTab, DatasetProfile } from '../types';
+import { Cpu } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: ActiveTab;
@@ -27,6 +28,7 @@ interface SidebarProps {
   onLoadSample: (sampleId: string) => void;
   onOpenGitHubSync?: () => void;
   onOpenInstallModal?: () => void;
+  onSwitchToFrontend2?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -37,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLoadSample,
   onOpenGitHubSync,
   onOpenInstallModal,
+  onSwitchToFrontend2,
 }) => {
   const navItems: { id: ActiveTab; label: string; icon: React.ElementType; badge?: string }[] = [
     { id: 'overview', label: 'Dataset Overview', icon: LayoutDashboard },
@@ -85,6 +88,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </span>
         </div>
       </div>
+
+      {/* Frontend 2 Neural Forecaster Quick Launcher */}
+      {onSwitchToFrontend2 && (
+        <div className="px-3 mt-2.5">
+          <button
+            id="btn-sidebar-launch-frontend-2"
+            onClick={onSwitchToFrontend2}
+            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-blue-900/40 to-indigo-900/40 hover:from-blue-900/60 hover:to-indigo-900/60 border border-indigo-500/30 text-slate-200 text-xs font-bold transition-all shadow-sm group text-left"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-indigo-600/30 flex items-center justify-center text-indigo-300 border border-indigo-500/30">
+                <Cpu className="w-3.5 h-3.5 text-indigo-300 group-hover:scale-110 transition-transform" />
+              </div>
+              <div>
+                <span className="block text-white text-[11px] font-bold">Frontend 2: Deep Lab</span>
+                <span className="text-[10px] text-indigo-300 font-normal">Train & Future Forecast</span>
+              </div>
+            </div>
+            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              New
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Navigation List */}
       <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">

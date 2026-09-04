@@ -188,3 +188,105 @@ export interface InsightSummary {
   featureInsights: InsightItem[];
   businessInsights: InsightItem[];
 }
+
+// ---------------------------------------------------------------------------
+// FRONTEND 2: Autonomous Neural Training & Future Forecasting Engine Types
+// ---------------------------------------------------------------------------
+
+export type AppFrontendMode = 'frontend-1-analytics' | 'frontend-2-deep-forecasting';
+
+export interface ContainerStoredFile {
+  id: string;
+  filename: string;
+  fileType: 'csv' | 'json' | 'excel';
+  sizeBytes: number;
+  rowCount: number;
+  columnCount: number;
+  uploadedAt: string;
+  containerPath: string;
+  status: 'ready' | 'training' | 'trained';
+  previewData: Record<string, any>[];
+  columns: string[];
+  numericColumns: string[];
+  inferredFrequency: string;
+  checksum: string;
+}
+
+export type NeuralArchitecture =
+  | 'transformer_tst'
+  | 'deep_lstm_gru'
+  | 'mamba_ssm'
+  | 'neural_ensemble';
+
+export interface NeuralModelConfig {
+  modelArchitecture: NeuralArchitecture;
+  horizon: number;
+  contextWindow: number;
+  hiddenDimension: number;
+  attentionHeads: number;
+  epochs: number;
+  batchSize: number;
+  learningRate: number;
+  quantization: 'FP16' | 'BF16' | 'INT8' | 'FP8';
+  targetSignal: string;
+  dropout: number;
+}
+
+export interface EpochTrainingLog {
+  epoch: number;
+  trainLoss: number;
+  valLoss: number;
+  learningRate: number;
+  batchThroughput: number;
+  kvCacheUtilPercent: number;
+  vramAllocatedMb: number;
+}
+
+export interface FutureForecastPoint {
+  step: number;
+  label: string;
+  forecast: number;
+  lower80: number;
+  upper80: number;
+  lower95: number;
+  upper95: number;
+  optimistic: number;
+  pessimistic: number;
+  shockScenario: number;
+}
+
+export interface DeepForecastResult {
+  modelArchitecture: string;
+  modelArchitectureLabel: string;
+  horizon: number;
+  targetSignal: string;
+  totalDataPoints: number;
+  forecastPoints: FutureForecastPoint[];
+  monteCarloPaths: number[][];
+  metrics: {
+    mape: number;
+    rmse: number;
+    mae: number;
+    rSquared: number;
+    directionalAccuracy: number;
+    tStatistic: number;
+    pValue: number;
+    nullHypothesisRejected: boolean;
+    fStatistic?: number;
+    chiSquareScore?: number;
+  };
+  hardwareTelemetry: {
+    avgInferenceLatencyMs: number;
+    p95LatencyMs: number;
+    p99LatencyMs: number;
+    peakVramMb: number;
+    peakKvCachePercent: number;
+    throughputSamplesSec: number;
+    precision: string;
+    devicePlacement: string;
+    vllmPagedAttentionEnabled: boolean;
+  };
+  trainingLogs: EpochTrainingLog[];
+  trendNarrative: string;
+  generatedAt: string;
+}
